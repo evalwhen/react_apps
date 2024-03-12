@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import productImage from './assets/image-rose.png'
-import avatar from './assets/avatars/elyse.png'
 
 // import './App.css'
 
@@ -11,8 +9,8 @@ import avatar from './assets/avatars/elyse.png'
       description: 'On-demand sand castle construction expertise.',
       url: '#',
       votes: 24,
-      submitterAvatarUrl: 'images/avatars/daniel.jpg',
-      productImageUrl: 'images/products/image-aqua.png',
+      submitterAvatarUrl: '/src/assets/avatars/daniel.jpg',
+      productImageUrl: '/src/assets/image-aqua.png',
     },
     {
       id: 2,
@@ -20,8 +18,8 @@ import avatar from './assets/avatars/elyse.png'
       description: 'Earn points when your favorite politicians pass legislation.',
       url: '#',
       votes: 35,
-      submitterAvatarUrl: 'images/avatars/kristy.png',
-      productImageUrl: 'images/products/image-rose.png',
+      submitterAvatarUrl: '/src/assets/avatars/kristy.png',
+      productImageUrl: '/src/assets/image-rose.png',
     },
     {
       id: 3,
@@ -29,8 +27,8 @@ import avatar from './assets/avatars/elyse.png'
       description: 'We already have your measurements and shipping address.',
       url: '#',
       votes: 30,
-      submitterAvatarUrl: 'images/avatars/veronika.jpg',
-      productImageUrl: 'images/products/image-steel.png',
+      submitterAvatarUrl: '/src/assets/avatars/veronika.jpg',
+      productImageUrl: '/src/assets/image-steel.png',
     },
     {
       id: 4,
@@ -38,8 +36,8 @@ import avatar from './assets/avatars/elyse.png'
       description: 'High-minded or absent-minded? You decide.',
       url: '#',
       votes: 29,
-      submitterAvatarUrl: 'images/avatars/molly.png',
-      productImageUrl: 'images/products/image-yellow.png',
+      submitterAvatarUrl: '/src/assets/avatars/molly.png',
+      productImageUrl: '/src/assets/image-yellow.png',
     },
   ];
 
@@ -53,23 +51,25 @@ function App() {
 }
 
 function Product(props) {
+  const [votes, setVotes] = useState(props.votes)
+
   return (
     <>
       <div className='flex mb-4 w-full'>
         <div className="w-[175px] mr-4">
-          <img src={productImage} alt="" />
+          <img src={props.imageUrl} alt="" />
         </div>
         <div  className='flex flex-col justify-center'>
-          <div className='flex mb-2'>
-            <a className='mr-2 cursor-pointer text-xl text-orange-600'>^</a>
-            <div className='font-semibold text-xl'>{props.votes}</div>
+          <div className='flex mb-2 items-center'>
+            <a className='mr-2 cursor-pointer text-xl text-orange-600' onClick={() => setVotes(votes => (votes + 1))}>^</a>
+            <div className='font-semibold text-xl'>{votes}</div>
           </div>
           <a className='cursor-pointer text-blue-500'>{props.title}</a>
           <p>{props.description}</p>
           <div className='flex items-center mt-2'>
             <p className='mr-2 text-gray-400'>Submitted by:</p>
             <div className=''>
-              <img src={avatar} alt="" className="w-10 h-10 rounded-full" />
+              <img src={props.avatarUrl} alt="" className="w-10 h-10 rounded-full" />
             </div>
           </div>
         </div>
@@ -88,6 +88,8 @@ function ProductList() {
       votes={product.votes}
       title={product.title}
       description={product.description}
+      avatarUrl={product.submitterAvatarUrl}
+      imageUrl={product.productImageUrl}
     />
   ));
   console.log(products);
