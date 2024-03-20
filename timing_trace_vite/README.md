@@ -9,4 +9,5 @@ Currently, two official plugins are available:
 
 # TODOS
 1. [UI] complete close and edit icon of timer.
-2. [LOGIC] try context component
+2. [LOGIC] try context component.
+3. [LOGIC] add server / client, fetch data from server.
