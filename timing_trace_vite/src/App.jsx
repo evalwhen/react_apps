@@ -149,47 +149,43 @@ function Timer({timer, deleteTimer, setIsEdit}) {
   );
 }
 
-function TimerList({timers, deleteTimer, updateTimer}) {
-
+function TimerList({ timers, deleteTimer, updateTimer }) {
   return (
     <div>
       {timers.map((timer) => (
-        // <Timer
-        //   key={timer.id}
-        //   id={timer.id}
-        //   title={timer.title}
-        //   description={timer.description}
-        //   deleteTimer={deleteTimer}
-        //   updateTimer={updateTimer}
-        // />
-        <EditableTimer timer={timer} deleteTimer={deleteTimer} updateTimer={updateTimer} />
+        <EditableTimer
+          key={timer.id}
+          timer={timer}
+          deleteTimer={deleteTimer}
+          updateTimer={updateTimer}
+        />
       ))}
     </div>
   );
 }
 
-function TooglableTimerForm({timer, createTimer}) {
+function TooglableTimerForm({ timer, createTimer }) {
   const [toogleForm, setToogleForm] = useState(false);
   return (
     <>
-    {
-      toogleForm 
-      ?
-      <div>
-        <TimerForm 
-        timer={timer}
-        setToogleForm={setToogleForm}
-        createTimer={createTimer}
-         />
-      </div>
-      :
-      (<div className="w-1/3 mx-auto text-center mt-4 mb-4">
-        <button className="border-gray-300 border px-3 py-1 text-xl"
-                onClick={() => setToogleForm(true)}
-        >+
-        </button>
-      </div>) 
-    }
+      {toogleForm ? (
+        <div>
+          <TimerForm
+            timer={timer}
+            setToogleForm={setToogleForm}
+            createTimer={createTimer}
+          />
+        </div>
+      ) : (
+        <div className="w-1/3 mx-auto text-center mt-4 mb-4">
+          <button
+            className="border-gray-300 border px-3 py-1 text-xl"
+            onClick={() => setToogleForm(true)}
+          >
+            +
+          </button>
+        </div>
+      )}
     </>
   );
 }
