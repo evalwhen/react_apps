@@ -26,20 +26,62 @@ function App() {
     setTimers(timers.concat(timer))
   }
 
+  function deleteTimer(id) {
+    console.log("here")
+    console.log(timers.filter( timer => timer.id != id))
+    setTimers(timers.filter( timer => timer.id != id));
+  }
+
+  function updateTimer(id, title, description) {
+    const timer = {
+      id: id,
+      title: title,
+      description: description
+    }
+
+    setTimers(timers.map(function(ti) {
+      if (ti.id == id) {
+        return timer;
+      } else {
+        return ti;
+      }
+    }))
+  }
+
   return (
     <>
       <div className="text-center mt-20 border-b">
         <h1 className="text-3xl font-semibold">Timers</h1>
       </div>
 
-      <TimerList timers={timers} />
+      <TimerList timers={timers} deleteTimer={deleteTimer} updateTimer={updateTimer} />
 
-      <TooglableTimerForm setTimers={setTimers} createTimer={createTimer} />
+      <TooglableTimerForm createTimer={createTimer} />
     </>
   );
 }
 
-function Timer({id, title, description}) {
+function EditableTimer({timer, deleteTimer, updateTimer}) {
+  const [isEdit, setIsEdit] = useState(false);
+
+  return (
+    <>
+    {
+      isEdit
+       ?
+      <TimerForm timer={timer} setToogleForm={setIsEdit} updateTimer={updateTimer} /> 
+      :
+      <Timer 
+         timer={timer}
+         deleteTimer={deleteTimer}
+         updateTimer={updateTimer}
+         setIsEdit={setIsEdit} />
+    }
+    </>
+  );
+}
+
+function Timer({timer, deleteTimer, setIsEdit}) {
   const [started, setStarted] = useState(false);
   const [count, setCount] = useState(0);
   const [elased, setElased] = useState("00:00:00");
@@ -78,15 +120,15 @@ function Timer({id, title, description}) {
       <div className="w-1/3 mx-auto mt-6">
         <div className="w-2/3 mx-auto border rounded-md">
           <div className="pl-4 mb-4 mt-4">
-            <h2 className="text-xl">{title}</h2>
-            <p className="text-sm text-gray-400">{description}</p>
+            <h2 className="text-xl">{timer.title}</h2>
+            <p className="text-sm text-gray-400">{timer.description}</p>
           </div>
 
           {/* <p className="text-center text-2xl mb-1 font-bold">00:21:13</p> */}
           <p className="text-center text-2xl mb-1 font-bold">{elased}</p>
           <div className="flex justify-end pr-4 mb-2">
-            <button className="mr-2">x</button>
-            <button>edit</button>
+            <button className="mr-2" onClick={() => deleteTimer(timer.id)}>x</button>
+            <button onClick={() => setIsEdit(true)}>edit</button>
           </div>
           {started ? (
             <button className="border w-full py-2 border-red-500 text-red-500 rounded-b-md"
@@ -107,22 +149,26 @@ function Timer({id, title, description}) {
   );
 }
 
-function TimerList({timers}) {
+function TimerList({timers, deleteTimer, updateTimer}) {
 
   return (
     <div>
       {timers.map((timer) => (
-        <Timer
-          key={timer.id}
-          title={timer.title}
-          description={timer.description}
-        />
+        // <Timer
+        //   key={timer.id}
+        //   id={timer.id}
+        //   title={timer.title}
+        //   description={timer.description}
+        //   deleteTimer={deleteTimer}
+        //   updateTimer={updateTimer}
+        // />
+        <EditableTimer timer={timer} deleteTimer={deleteTimer} updateTimer={updateTimer} />
       ))}
     </div>
   );
 }
 
-function TooglableTimerForm({createTimer}) {
+function TooglableTimerForm({timer, createTimer}) {
   const [toogleForm, setToogleForm] = useState(false);
   return (
     <>
@@ -131,6 +177,7 @@ function TooglableTimerForm({createTimer}) {
       ?
       <div>
         <TimerForm 
+        timer={timer}
         setToogleForm={setToogleForm}
         createTimer={createTimer}
          />
@@ -147,12 +194,17 @@ function TooglableTimerForm({createTimer}) {
   );
 }
 
-function TimerForm({setToogleForm, createTimer}) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+function TimerForm({timer, setToogleForm, updateTimer, createTimer}) {
+  const [title, setTitle] = useState(timer ? timer.title : "");
+  const [description, setDescription] = useState(timer ? timer.description : "");
 
   function handleCreate() {
     createTimer(title, description, new Date());
+    setToogleForm(false);
+  }
+
+  function handleUpdate() {
+    updateTimer(timer.id, title, description);
     setToogleForm(false);
   }
 
@@ -167,6 +219,7 @@ function TimerForm({setToogleForm, createTimer}) {
             <input
               type="text"
               className="border text-xl py-1 px-2"
+              value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
@@ -177,16 +230,26 @@ function TimerForm({setToogleForm, createTimer}) {
             <input
               type="text"
               className="border text-xl py-1 px-2"
+              value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           <div className="flex justify-evenly">
-            <button
-              className="border border-green-400 text-green-400 w-full py-1 rounded-bl-md"
-              onClick={() => handleCreate()}
-            >
-              Create
-            </button>
+            {updateTimer ? (
+              <button
+                className="border border-green-400 text-green-400 w-full py-1 rounded-bl-md"
+                onClick={() => handleUpdate()}
+              >
+                Update
+              </button>
+            ) : (
+              <button
+                className="border border-green-400 text-green-400 w-full py-1 rounded-bl-md"
+                onClick={() => handleCreate()}
+              >
+                Create
+              </button>
+            )}
             <button
               className="border border-red-400 text-red-400 w-full py-1 rounded-br-md"
               onClick={() => setToogleForm(false)}
