@@ -36,8 +36,8 @@ function Main() {
   return (
     <div className='w-2/3 flex justify-between mx-auto h-screen'>
       <MovieList />
-      {/* <WatchedList /> */}
-      <MovieDetail />
+      <WatchedList />
+      {/* <MovieDetail /> */}
     </div>
   )
 }
@@ -72,18 +72,16 @@ function Movie() {
 
 function MovieDetail() {
   return (
-    // <div className='w-1/2 bg-gray-800 rounded-lg'>
-    //   {/* <Movie /> */}
-    // </div>
-
     <div className="w-1/2 bg-gray-800 rounded-lg">
-      <div className="flex items-center">
+      <div className="flex items-center relative">
+        <button class="absolute bg-white rounded-full px-2 py-1 left-2 top-2 text-2xl text-black">←</button>
+        <button class="absolute bg-gray-800 rounded-full  right-2 top-2 px-2 text-base text-white aspect-square">-</button>
         <img
           src="https://m.media-amazon.com/images/M/MV5BYmU1NDRjNDgtMzhiMi00NjZmLTg5NGItZDNiZjU5NTU4OTE0XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg"
           alt=""
-          className="w-1/3"
+          className="w-1/3 rounded-tl-lg"
         />
-        <div className="text-white flex flex-col gap-6 px-6 py-6 bg-gray-700 w-full">
+        <div className="text-white flex flex-col gap-6 px-6 py-6 bg-gray-700 w-full rounded-tr-lg">
           <h1 className="text-2xl font-semibold">Back to the Future Part II</h1>
           <p className="text-sm">22 Nov 1989 • 108 min</p>
           <p className="text-sm">Adventure, Comedy, Sci-Fi</p>
@@ -91,14 +89,16 @@ function MovieDetail() {
         </div>
       </div>
       <Stars />
-      <div className="flex flex-col px-10 gap-4 text-gray-300" >
-        <p className='text-sm'>
+      <div className="flex flex-col px-10 gap-4 text-gray-300">
+        <p className="text-sm">
           After visiting 2015, Marty McFly must repeat his visit to 1955 to
           prevent disastrous changes to 1985...without interfering with his
           first trip.
         </p>
-        <p className='text-base'>Starring Michael J. Fox, Christopher Lloyd, Lea Thompson</p>
-        <p className='text-base'>Directed by Robert Zemeckis</p>
+        <p className="text-base">
+          Starring Michael J. Fox, Christopher Lloyd, Lea Thompson
+        </p>
+        <p className="text-base">Directed by Robert Zemeckis</p>
       </div>
     </div>
   );
@@ -133,7 +133,79 @@ function Star() {
 }
 
 function WatchedList() {
-  // return <MovieDetail />;
+  return (
+    <div className="w-1/2 bg-gray-800 rounded-lg relative">
+      <button class="absolute bg-gray-900 rounded-full  right-2 top-2 px-2 text-base text-white aspect-square">
+        -
+      </button>
+      <div className="text-white font-semibold bg-gray-700 px-8 py-3 rounded-lg">
+        <h1>MOVIES YOU WATCHED</h1>
+        <div className='flex gap-6 items-center justify-start'>
+          <p className='flex gap-2 items-center'>
+            <span>#️⃣</span>
+            {/* <span>1 movies</span> */}
+            <div className='flex flex-col'>
+              <span>1</span>
+              <span>movies</span>
+            </div>
+          </p>
+          <p className='flex gap-2'>
+            <span>⭐️</span>
+            <span>8.50</span>
+          </p>
+          <p className='flex gap-2'>
+            <span>🌟</span>
+            <span>5.00</span>
+          </p>
+          <p className='flex gap-2 items-center'>
+            <span>⏳</span>
+            {/* <span>116 min</span> */}
+            <div className='flex flex-col'>
+              <span>1</span>
+              <span>movies</span>
+            </div>
+
+          </p>
+        </div>
+      </div>
+      <div>
+        <WatchedMovie />
+      </div>
+    </div>
+  );
+}
+
+function WatchedMovie() {
+  return (
+    <div className="flex mt-6 items-center border-b py-4 px-10 border-gray-500 relative">
+      <button className="absolute right-6 bg-red-600 aspect-square rounded-full px-1 text-xs">X</button>
+      <img
+        src="https://m.media-amazon.com/images/M/MV5BYmU1NDRjNDgtMzhiMi00NjZmLTg5NGItZDNiZjU5NTU4OTE0XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg"
+        alt=""
+        className="h-16 mr-4"
+      />
+      <div>
+        <p className="text-white text-lg font-semibold">Back to the Future </p>
+        <div className="flex gap-6 items-center justify-start text-white">
+          <p className="flex gap-2">
+            <span>⭐️</span>
+            <span>8.50</span>
+          </p>
+          <p className="flex gap-2">
+            <span>🌟</span>
+            <span>5.00</span>
+          </p>
+          <p className="flex gap-2 items-center">
+            <span>⏳</span>
+            {/* <span>116 min</span> */}
+            <div className="flex">
+              <span>1 movies</span>
+            </div>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default App
