@@ -1,19 +1,25 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect } from 'react';
+import { useMovies } from './useMovie';
 // import './App.css'
 
+const KEY = "f84fc31d";
+// const KEY = "189f5a14";
+
+
 function App() {
+  const [query, setQuery] = useState("");
+  const [isLoading, error, movies] = useMovies(query)
 
   return (
     <div className='h-screen'>
-      <Header />
-      <Main />
+      <Header query={query} setQuery={setQuery} />
+      <Main movies={movies}/>
     </div>
   )
 }
 
-function Header() {
+function Header({query, setQuery}) {
   return (
     <div className="flex justify-between items-center  px-8 py-3 bg-purple-600 mx-6 my-5 rounded-lg">
       <div className="flex text-2xl">
@@ -26,66 +32,104 @@ function Header() {
         type="text"
         className="text-lg px-3 py-2 rounded-lg bg-purple-500 text-white w-[25rem] border-none"
         placeholder="Search movies..."
+        onChange={(e) => setQuery(e.target.value)}
+        value={query}
       />
       <p className="text-white text-xl">Found 10 results</p>
     </div>
   );
 }
 
-function Main() {
+function Main({movies}) {
+  const [selectedId, setSelectedId] = useState(null);
+
+  function handleSelectMovie(id) {
+    // setSelectedId(id == selectedId ? null : id)
+    setSelectedId(id)
+  }
+
   return (
-    <div className='w-2/3 flex justify-between mx-auto h-screen'>
-      <MovieList />
-      <WatchedList />
-      {/* <MovieDetail /> */}
+    <div className='w-2/3 flex justify-between mx-auto min-h-svh'>
+      <MovieList movies={movies}  onSelectMovie={handleSelectMovie} />
+      {
+        selectedId 
+        ? 
+        <MovieDetail selectedId={selectedId}/> 
+        : 
+        <WatchedList/>
+      }
     </div>
   )
 }
 
-function MovieList() {
+function MovieList({movies, onSelectMovie}) {
   return (
     <div className='w-1/2 bg-gray-800 rounded-lg mr-6'>
-      <Movie />
-      <Movie />
+      {/* <Movie movie={movies}/> */}
+      {/* <Movie /> */}
+      {
+        movies?.map(m => <Movie key={m.imdbID} movie={m} onSelectMovie={onSelectMovie}/>)
+      }
     </div>
   )
 }
 
-function Movie() {
+function Movie({movie, onSelectMovie}) {
   return (
-    <div className='flex border-b px-8 py-4 border-gray-600 cursor-pointer hover:bg-gray-600'>
+    <div className='flex border-b px-8 py-4 border-gray-600 cursor-pointer hover:bg-gray-600'
+         onClick={() => onSelectMovie(movie.imdbID)}
+    >
       <img
-        src="https://m.media-amazon.com/images/M/MV5BYmU1NDRjNDgtMzhiMi00NjZmLTg5NGItZDNiZjU5NTU4OTE0XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg"
+        src={movie.Poster}
         alt=""
         className='h-16 mr-4'
       />
       <div className='flex flex-col justify-center'>
-        <p className='text-white text-lg font-semibold'>Back to the Future </p>
+        {/* <p className='text-white text-lg font-semibold'>"Title"</p> */}
+        <p className='text-white text-lg font-semibold'>{movie.Title}</p>
         <div className='flex'>
           <span className='mr-2'>🗓</span>
-          <span className='text-white'>1980</span>
+          <span className='text-white'>{movie.Year}</span>
         </div>
       </div>
     </div>
   );
 }
 
-function MovieDetail() {
+function MovieDetail({selectedId}) {
+  const [movie, setMovie] = useState(null);
+
+  useEffect(
+    function() {
+      async function getMovieDetail() {
+        const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`)
+        console.log(selectedId);
+        const data = await res.json();
+        console.log(data);
+
+        setMovie(data);
+      }
+
+      getMovieDetail();
+    },
+    [selectedId]
+  )
+
   return (
     <div className="w-1/2 bg-gray-800 rounded-lg">
-      <div className="flex items-center relative">
+      <div className="flex items-center relative h-1/4">
         <button class="absolute bg-white rounded-full px-2 py-1 left-2 top-2 text-2xl text-black">←</button>
         <button class="absolute bg-gray-800 rounded-full  right-2 top-2 px-2 text-base text-white aspect-square">-</button>
         <img
-          src="https://m.media-amazon.com/images/M/MV5BYmU1NDRjNDgtMzhiMi00NjZmLTg5NGItZDNiZjU5NTU4OTE0XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg"
+          src={movie.Poster}
           alt=""
-          className="w-1/3 rounded-tl-lg"
+          className="w-1/3 rounded-tl-lg h-full"
         />
-        <div className="text-white flex flex-col gap-6 px-6 py-6 bg-gray-700 w-full rounded-tr-lg">
-          <h1 className="text-2xl font-semibold">Back to the Future Part II</h1>
-          <p className="text-sm">22 Nov 1989 • 108 min</p>
-          <p className="text-sm">Adventure, Comedy, Sci-Fi</p>
-          <p className="text-sm">⭐️ 7.8 IMDb rating</p>
+        <div className="text-white flex flex-col justify-center gap-6 px-6 py-6 bg-gray-700 w-full rounded-tr-lg h-full" >
+          <h1 className="text-2xl font-semibold">{movie.Title}</h1>
+          <p className="text-sm">{movie.Released}</p>
+          <p className="text-sm">{movie.Genre}</p>
+          <p className="text-sm">⭐️ {movie.imdbRating} IMDb rating</p>
         </div>
       </div>
       <Stars />
@@ -135,29 +179,29 @@ function Star() {
 function WatchedList() {
   return (
     <div className="w-1/2 bg-gray-800 rounded-lg relative">
-      <button class="absolute bg-gray-900 rounded-full  right-2 top-2 px-2 text-base text-white aspect-square">
+      <button className="absolute bg-gray-900 rounded-full  right-2 top-2 px-2 text-base text-white aspect-square">
         -
       </button>
       <div className="text-white font-semibold bg-gray-700 px-8 py-3 rounded-lg">
         <h1>MOVIES YOU WATCHED</h1>
         <div className='flex gap-6 items-center justify-start'>
-          <p className='flex gap-2 items-center'>
+          <div className='flex gap-2 items-center'>
             <span>#️⃣</span>
             {/* <span>1 movies</span> */}
             <div className='flex flex-col'>
               <span>1</span>
               <span>movies</span>
             </div>
-          </p>
-          <p className='flex gap-2'>
+          </div>
+          <div className='flex gap-2'>
             <span>⭐️</span>
             <span>8.50</span>
-          </p>
-          <p className='flex gap-2'>
+          </div>
+          <div className='flex gap-2'>
             <span>🌟</span>
             <span>5.00</span>
-          </p>
-          <p className='flex gap-2 items-center'>
+          </div>
+          <div className='flex gap-2 items-center'>
             <span>⏳</span>
             {/* <span>116 min</span> */}
             <div className='flex flex-col'>
@@ -165,7 +209,7 @@ function WatchedList() {
               <span>movies</span>
             </div>
 
-          </p>
+          </div>
         </div>
       </div>
       <div>
@@ -187,21 +231,21 @@ function WatchedMovie() {
       <div>
         <p className="text-white text-lg font-semibold">Back to the Future </p>
         <div className="flex gap-6 items-center justify-start text-white">
-          <p className="flex gap-2">
+          <div className="flex gap-2">
             <span>⭐️</span>
             <span>8.50</span>
-          </p>
-          <p className="flex gap-2">
+          </div>
+          <div className="flex gap-2">
             <span>🌟</span>
             <span>5.00</span>
-          </p>
-          <p className="flex gap-2 items-center">
+          </div>
+          <div className="flex gap-2 items-center">
             <span>⏳</span>
             {/* <span>116 min</span> */}
             <div className="flex">
               <span>1 movies</span>
             </div>
-          </p>
+          </div>
         </div>
       </div>
     </div>
