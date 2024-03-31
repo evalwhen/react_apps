@@ -48,13 +48,17 @@ function Main({movies}) {
     setSelectedId(id)
   }
 
+  function handleCloseDetail() {
+    setSelectedId(null);
+  }
+
   return (
     <div className='w-2/3 flex justify-between mx-auto min-h-svh'>
       <MovieList movies={movies}  onSelectMovie={handleSelectMovie} />
       {
         selectedId 
         ? 
-        <MovieDetail selectedId={selectedId}/> 
+        <MovieDetail selectedId={selectedId} onClose={handleCloseDetail}/> 
         : 
         <WatchedList/>
       }
@@ -96,7 +100,7 @@ function Movie({movie, onSelectMovie}) {
   );
 }
 
-function MovieDetail({selectedId}) {
+function MovieDetail({selectedId, onClose}) {
   const [isLoading, setIsLoading] = useState(false);
   const [movie, setMovie] = useState({});
 
@@ -126,10 +130,13 @@ function MovieDetail({selectedId}) {
       ) : (
         <>
           <div className="flex items-center relative h-1/4">
-            <button class="absolute bg-white rounded-full px-2 py-1 left-2 top-2 text-2xl text-black">
+            <button
+              className="absolute bg-white rounded-full px-2 py-1 left-2 top-2 text-2xl text-black"
+              onClick={() => onClose()}
+            >
               ←
             </button>
-            <button class="absolute bg-gray-800 rounded-full  right-2 top-2 px-2 text-base text-white aspect-square">
+            <button className="absolute bg-gray-800 rounded-full  right-2 top-2 px-2 text-base text-white aspect-square">
               -
             </button>
             <img
@@ -144,8 +151,8 @@ function MovieDetail({selectedId}) {
               <p className="text-sm">⭐️ {movie.imdbRating} IMDb rating</p>
             </div>
           </div>
-          <Stars />
           <div className="flex flex-col px-10 gap-4 text-gray-300">
+            <Stars />
             <p className="text-sm">
               After visiting 2015, Marty McFly must repeat his visit to 1955 to
               prevent disastrous changes to 1985...without interfering with his
@@ -167,25 +174,44 @@ function Loader() {
 }
 
 function Stars() {
-  const stars = [...Array(10)].map((_, i) => <Star />);
+  const [tempRating, setTempRating] = useState(0);
+
+  const stars = [...Array(10)].map(
+    function (_, i) {
+      return <Star 
+      key={i}
+      full={tempRating > i ? true : false}
+      onHoverIn={() => setTempRating(i+1)}
+      onHoverOut={() => setTempRating(0)}
+       />;
+    }
+    );
   return (
-    <div className='flex justify-center my-6'>
-      <div className="flex bg-gray-700 px-6 py-4 rounded-lg">{stars}</div>
-    </div>
+      <div className="flex items-center my-6 bg-gray-700 px-10 py-4 rounded-lg gap-6">
+        <div className="flex">{stars}</div>
+        <p className="text-yellow-500 text-center">
+          {tempRating > 0 ? tempRating : " "}
+        </p>
+      </div>
   );
 }
 
-function Star() {
+function Star({full, onHoverIn, onHoverOut}) {
   return (
     <>
-      <span>
+      <span onMouseEnter={onHoverIn} onMouseLeave={onHoverOut}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           stroke="#fcc419"
           // className="w-6 cursor-pointer hover:fill-yellow-400"
-          className="w-6 cursor-pointer"
+          // className="w-6 cursor-pointer {}"
+          className={
+            full
+              ? "w-6 cursor-pointer fill-yellow-400"
+              : "w-6 cursor-pointer"
+          }
         >
           <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
         </svg>
