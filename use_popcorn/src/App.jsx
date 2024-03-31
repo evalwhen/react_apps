@@ -97,17 +97,21 @@ function Movie({movie, onSelectMovie}) {
 }
 
 function MovieDetail({selectedId}) {
-  const [movie, setMovie] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [movie, setMovie] = useState({});
 
   useEffect(
     function() {
       async function getMovieDetail() {
+        setIsLoading(true);
+
         const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`)
         console.log(selectedId);
         const data = await res.json();
         console.log(data);
 
         setMovie(data);
+        setIsLoading(false);
       }
 
       getMovieDetail();
@@ -117,35 +121,49 @@ function MovieDetail({selectedId}) {
 
   return (
     <div className="w-1/2 bg-gray-800 rounded-lg">
-      <div className="flex items-center relative h-1/4">
-        <button class="absolute bg-white rounded-full px-2 py-1 left-2 top-2 text-2xl text-black">←</button>
-        <button class="absolute bg-gray-800 rounded-full  right-2 top-2 px-2 text-base text-white aspect-square">-</button>
-        <img
-          src={movie.Poster}
-          alt=""
-          className="w-1/3 rounded-tl-lg h-full"
-        />
-        <div className="text-white flex flex-col justify-center gap-6 px-6 py-6 bg-gray-700 w-full rounded-tr-lg h-full" >
-          <h1 className="text-2xl font-semibold">{movie.Title}</h1>
-          <p className="text-sm">{movie.Released}</p>
-          <p className="text-sm">{movie.Genre}</p>
-          <p className="text-sm">⭐️ {movie.imdbRating} IMDb rating</p>
-        </div>
-      </div>
-      <Stars />
-      <div className="flex flex-col px-10 gap-4 text-gray-300">
-        <p className="text-sm">
-          After visiting 2015, Marty McFly must repeat his visit to 1955 to
-          prevent disastrous changes to 1985...without interfering with his
-          first trip.
-        </p>
-        <p className="text-base">
-          Starring Michael J. Fox, Christopher Lloyd, Lea Thompson
-        </p>
-        <p className="text-base">Directed by Robert Zemeckis</p>
-      </div>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <div className="flex items-center relative h-1/4">
+            <button class="absolute bg-white rounded-full px-2 py-1 left-2 top-2 text-2xl text-black">
+              ←
+            </button>
+            <button class="absolute bg-gray-800 rounded-full  right-2 top-2 px-2 text-base text-white aspect-square">
+              -
+            </button>
+            <img
+              src={movie.Poster}
+              alt=""
+              className="w-1/3 rounded-tl-lg h-full"
+            />
+            <div className="text-white flex flex-col justify-center gap-6 px-6 py-6 bg-gray-700 w-full rounded-tr-lg h-full">
+              <h1 className="text-2xl font-semibold">{movie.Title}</h1>
+              <p className="text-sm">{movie.Released}</p>
+              <p className="text-sm">{movie.Genre}</p>
+              <p className="text-sm">⭐️ {movie.imdbRating} IMDb rating</p>
+            </div>
+          </div>
+          <Stars />
+          <div className="flex flex-col px-10 gap-4 text-gray-300">
+            <p className="text-sm">
+              After visiting 2015, Marty McFly must repeat his visit to 1955 to
+              prevent disastrous changes to 1985...without interfering with his
+              first trip.
+            </p>
+            <p className="text-base">
+              Starring Michael J. Fox, Christopher Lloyd, Lea Thompson
+            </p>
+            <p className="text-base">Directed by Robert Zemeckis</p>
+          </div>
+        </>
+      )}
     </div>
   );
+}
+
+function Loader() {
+  return <p className="text-white text-center text-3xl fond-bold mt-12">Loading...</p>;
 }
 
 function Stars() {
