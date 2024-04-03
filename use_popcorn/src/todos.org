@@ -1,0 +1,4 @@
+* Todos
+** delete watched movie
+** use local storage to save movie
+** reset rating.
