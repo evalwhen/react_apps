@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useEffect } from 'react';
 import { useMovies } from './useMovie';
+import { useLocalStorageState } from './useLocalStorage';
 // import './App.css'
 
 const KEY = "f84fc31d";
@@ -42,7 +43,8 @@ function Header({query, setQuery}) {
 
 function Main({movies}) {
   const [selectedId, setSelectedId] = useState(null);
-  const [watched, setWatched] = useState([]);
+  // const [watched, setWatched] = useState([]);
+  const [watched, setWatched] = useLocalStorageState([], "watched");
 
   function handleSelectMovie(id) {
     // setSelectedId(id == selectedId ? null : id)
@@ -57,6 +59,10 @@ function Main({movies}) {
     setWatched((watched) => [...watched, newWatched])
   }
 
+  function handleDelete(id) {
+    setWatched((watched) => watched.filter((m) => (m.imdbID != id)))
+  }
+
   return (
     <div className="w-2/3 flex justify-between mx-auto min-h-svh">
       <MovieList movies={movies} onSelectMovie={handleSelectMovie} />
@@ -65,9 +71,10 @@ function Main({movies}) {
           selectedId={selectedId}
           onClose={handleCloseDetail}
           onAddMovie={handleAdd}
+          watched={watched}
         />
       ) : (
-        <WatchedList watched={watched} />
+        <WatchedList watched={watched} onDelete={handleDelete}/>
       )}
     </div>
   );
@@ -107,10 +114,13 @@ function Movie({movie, onSelectMovie}) {
   );
 }
 
-function MovieDetail({selectedId, onClose, onAddMovie}) {
+function MovieDetail({selectedId, onClose, onAddMovie, watched}) {
   const [isLoading, setIsLoading] = useState(false);
   const [movie, setMovie] = useState({});
   const [userRating, setUserRating] = useState(0);
+
+  const isWatched = watched.filter((m) => m.imdbID == selectedId).length > 0;
+  const userRated= watched.find((m) => m.imdbID === selectedId)?.userRating;
 
   useEffect(
     function () {
@@ -145,6 +155,20 @@ function MovieDetail({selectedId, onClose, onAddMovie}) {
     Director: director,
     Genre: genre,
   } = movie;
+
+  useEffect(
+    function() {
+      if (title) {
+        document.title = `Movie | ${title}`
+      }
+
+      return function() {
+        document.title = 'usePopcorn';
+      }
+    },
+    [title]
+  )
+
 
   function handleAddWatched() {
     const newWatched = {
@@ -196,6 +220,11 @@ function MovieDetail({selectedId, onClose, onAddMovie}) {
           </div>
           <div className="flex flex-col px-10 gap-4 text-gray-300">
             <div className="flex flex-col my-6 bg-gray-700 px-10 py-4 rounded-lg gap-6">
+              {
+                isWatched ?
+                <p className='font-bold'>You rated with movie {userRated} ⭐️</p>
+                :
+                <>
               <Stars
                 userRating={userRating}
                 setUserRating={setUserRating}
@@ -206,6 +235,8 @@ function MovieDetail({selectedId, onClose, onAddMovie}) {
                   + Add to list
                 </button>
               )}
+              </>
+              }
             </div>
             <p className="text-sm">
               After visiting 2015, Marty McFly must repeat his visit to 1955 to
@@ -287,7 +318,7 @@ function Star({full, onHoverIn, onHoverOut, onRating}) {
   );
 }
 
-function WatchedList({watched}) {
+function WatchedList({watched, onDelete}) {
   return (
     <div className="w-1/2 bg-gray-800 rounded-lg relative">
       <button className="absolute bg-gray-900 rounded-full  right-2 top-2 px-2 text-base text-white aspect-square">
@@ -324,17 +355,19 @@ function WatchedList({watched}) {
         </div>
       </div>
       <div>
-        {watched.map((m) => <WatchedMovie movie={m} key={m.imdbID}/>)}
+        {watched.map((m) => <WatchedMovie movie={m} key={m.imdbID} onDelete={onDelete}/>)}
         {/* <WatchedMovie /> */}
       </div>
     </div>
   );
 }
 
-function WatchedMovie({movie}) {
+function WatchedMovie({movie, onDelete}) {
   return (
     <div className="flex mt-6 items-center border-b py-4 px-10 border-gray-500 relative">
-      <button className="absolute right-6 bg-red-600 aspect-square rounded-full px-1 text-xs">X</button>
+      <button className="absolute right-6 bg-red-600 aspect-square rounded-full px-1 text-xs"
+              onClick={() => onDelete(movie.imdbID)}
+      >X</button>
       <img
         // src="https://m.media-amazon.com/images/M/MV5BYmU1NDRjNDgtMzhiMi00NjZmLTg5NGItZDNiZjU5NTU4OTE0XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg"
         src={movie.poster}
@@ -359,7 +392,7 @@ function WatchedMovie({movie}) {
             <span>⏳</span>
             {/* <span>116 min</span> */}
             <div className="flex">
-              <span>1 min</span>
+              <span>{movie.runtime} min</span>
             </div>
           </div>
         </div>
