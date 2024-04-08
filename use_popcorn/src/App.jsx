@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useEffect } from 'react';
 import { useMovies } from './useMovie';
 import { useLocalStorageState } from './useLocalStorage';
+import { useKey } from './useKey';
 // import './App.css'
 
 const KEY = "f84fc31d";
@@ -14,13 +15,13 @@ function App() {
 
   return (
     <div className='h-screen'>
-      <Header query={query} setQuery={setQuery} />
+      <Header query={query} setQuery={setQuery} movies={movies} />
       <Main movies={movies}/>
     </div>
   )
 }
 
-function Header({query, setQuery}) {
+function Header({query, setQuery, movies}) {
   return (
     <div className="flex justify-between items-center  px-8 py-3 bg-purple-600 mx-6 my-5 rounded-lg">
       <div className="flex text-2xl">
@@ -36,7 +37,7 @@ function Header({query, setQuery}) {
         onChange={(e) => setQuery(e.target.value)}
         value={query}
       />
-      <p className="text-white text-xl">Found 10 results</p>
+      <p className="text-white text-xl">Found {movies.length} results</p>
     </div>
   );
 }
@@ -169,6 +170,7 @@ function MovieDetail({selectedId, onClose, onAddMovie, watched}) {
     [title]
   )
 
+  useKey("Escape", onClose);
 
   function handleAddWatched() {
     const newWatched = {
