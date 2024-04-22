@@ -11,6 +11,7 @@ function App() {
 
         <Process />
         <Question />
+        <Footer />
       </div>
     </>
   );
@@ -77,6 +78,17 @@ function Question() {
       </div>
     </div>
   );
+}
+
+function Footer() {
+  return (
+    <>
+    <div className='flex justify-between items-center w-full text-white mt-8'>
+      <p className='py-3 px-6 border border-gray-500 rounded-full text-xl'>04:25</p>
+      <button className='py-3 px-6 bg-gray-600 rounded-full text-xl'>Next</button>
+    </div>
+    </>
+  )
 }
 
 export default App;
