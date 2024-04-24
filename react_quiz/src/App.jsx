@@ -1,17 +1,42 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
+import { useEffect } from 'react';
 
 function App() {
+  const [status, setStatus] = useState("ready");
+  const [questions, setQuetions] = useState([]);
+  const [index, setIndex] = useState(0);
+
+  function handleStart() {
+    setStatus("active");
+  }
+
+  function handleNext() {
+    setIndex((i) => i + 1)
+  }
+
+  useEffect(function() {
+    fetch("http://localhost:9000/questions")
+    .then((res) => res.json())
+    .then((data) => setQuetions(data))
+    .catch((err) => console.log(err))
+  },
+  []);
+
   return (
     <>
       <Header />
       <div className="flex flex-col items-center w-[550px] mx-auto">
-        {/* <Welcome /> */}
+        {status === "ready" && <Welcome onStart={handleStart}/>}
 
-        <Process />
-        <Question />
-        <Footer />
+        {status === "active" && (
+          <>
+          <Process />
+          <Question questions={questions} index={index} />
+          <Footer onNext={handleNext}/>
+          </>
+        )}
       </div>
     </>
   );
@@ -28,7 +53,7 @@ function Header() {
   );
 }
 
-function Welcome() {
+function Welcome({onStart}) {
   return (
     <>
       <p className="text-gray-100 text-4xl font-semibold mt-10">
@@ -37,7 +62,8 @@ function Welcome() {
       <p className="text-gray-200 text-2xl mt-4 font-medium">
         15 questions to test your React mastery
       </p>
-      <button className="mt-8 text-gray-200 py-4 px-8 bg-gray-600 rounded-full text-xl cursor-pointer">
+      <button className="mt-8 text-gray-200 py-4 px-8 bg-gray-600 rounded-full text-xl cursor-pointer"
+              onClick={() => onStart()}>
         Let's start
       </button>
     </>
@@ -56,14 +82,20 @@ function Process() {
   );
 }
 
-function Question() {
+function Question({questions, index}) {
+  const question = questions[index];
   return (
     <div className="mt-8 w-full">
       <h1 className="text-2xl font-semibold text-gray-200 mt-8">
-        Which is the most popular JavaScript framework?
+        {question.question}
       </h1>
       <div className="flex flex-col gap-4 mt-4">
-        <p className="bg-gray-600 py-4 px-8 rounded-full text-xl text-gray-200 cursor-pointer hover:translate-x-6 hover:bg-gray-700 hover:border-2 hover:border-gray-500 duration-500">
+        {question.options.map((o) => (
+          <p className="bg-gray-600 py-4 px-8 rounded-full text-xl text-gray-200 cursor-pointer hover:translate-x-6 hover:bg-gray-700 hover:border-2 hover:border-gray-500 duration-500">
+            {o}
+          </p>
+        ))}
+        {/* <p className="bg-gray-600 py-4 px-8 rounded-full text-xl text-gray-200 cursor-pointer hover:translate-x-6 hover:bg-gray-700 hover:border-2 hover:border-gray-500 duration-500">
           Angular
         </p>
         <p className="bg-gray-600 py-4 px-8 rounded-full text-xl text-gray-200 cursor-pointer hover:translate-x-6 hover:bg-gray-700 hover:border-2 hover:border-gray-500 duration-500">
@@ -74,18 +106,20 @@ function Question() {
         </p>
         <p className="bg-gray-600 py-4 px-8 rounded-full text-xl text-gray-200 cursor-pointer hover:translate-x-6 hover:bg-gray-700 hover:border-2 hover:border-gray-500 duration-500">
           Vue
-        </p>
+        </p> */}
       </div>
     </div>
   );
 }
 
-function Footer() {
+function Footer({onNext}) {
   return (
     <>
     <div className='flex justify-between items-center w-full text-white mt-8'>
       <p className='py-3 px-6 border border-gray-500 rounded-full text-xl'>04:25</p>
-      <button className='py-3 px-6 bg-gray-600 rounded-full text-xl'>Next</button>
+      <button className='py-3 px-6 bg-gray-600 rounded-full text-xl'
+              onClick={() => onNext()}
+      >Next</button>
     </div>
     </>
   )
