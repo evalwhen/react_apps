@@ -32,7 +32,7 @@ function App() {
 
         {status === "active" && (
           <>
-          <Process />
+          <Process index={index} />
           <Question questions={questions} index={index} />
           <Footer onNext={handleNext}/>
           </>
@@ -70,12 +70,12 @@ function Welcome({onStart}) {
   );
 }
 
-function Process() {
+function Process({index}) {
   return (
     <div className="w-full mt-8">
       <p className=" h-4 bg-gray-100 rounded-full"></p>
       <div className='flex justify-between mt-2'>
-        <p className='text-white'>Question 1 / 15</p>
+        <p className='text-white'>Question {index} / 15</p>
         <p className='text-white'>0 / 280</p>
       </div>
     </div>
